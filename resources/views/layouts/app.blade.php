@@ -29,14 +29,14 @@
 
             <a
                 href="{{ route('clientes.index') }}"
-                class="hover:text-[#FFC107] transition"
+                class="{{ request()->routeIs('clientes.index') || request()->routeIs('clientes.show') || request()->routeIs('clientes.edit') ? 'font-semibold text-[#FFC107]' : 'transition hover:text-[#FFC107]' }}"
             >
                 Clientes
             </a>
 
             <a
                 href="{{ route('clientes.create') }}"
-                class="hover:text-[#FFC107] transition"
+                class="{{ request()->routeIs('clientes.create') ? 'font-semibold text-[#FFC107]' : 'transition hover:text-[#FFC107]' }}"
             >
                 Registrar
             </a>
