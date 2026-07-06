@@ -73,7 +73,7 @@ class ClienteController extends Controller
      */
     public function edit(Cliente $cliente)
     {
-        //
+        return view('clientes.edit', compact('cliente'));
     }
 
     /**
@@ -81,7 +81,33 @@ class ClienteController extends Controller
      */
     public function update(Request $request, Cliente $cliente)
     {
-        //
+        $request->validate(
+            [
+                'nombre_completo' => 'required',
+                'correo' => 'required|email|unique:clientes,correo,' . $cliente->id,
+                'telefono' => 'required',
+                'pais' => 'required',
+            ],
+            [
+                'nombre_completo.required' => 'El nombre completo es obligatorio.',
+                'correo.required' => 'El correo es obligatorio.',
+                'correo.email' => 'Debe ingresar un correo válido.',
+                'correo.unique' => 'Este correo ya está registrado.',
+                'telefono.required' => 'El teléfono es obligatorio.',
+                'pais.required' => 'El país es obligatorio.',
+            ]
+        );
+
+        $cliente->update([
+            'nombre_completo' => $request->nombre_completo,
+            'correo' => $request->correo,
+            'telefono' => $request->telefono,
+            'pais' => $request->pais,
+        ]);
+
+        return redirect()
+            ->route('clientes.index')
+            ->with('success', 'Cliente actualizado correctamente.');
     }
 
     /**
