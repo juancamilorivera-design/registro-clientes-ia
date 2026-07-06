@@ -1,36 +1,57 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="csrf-token" content="{{ csrf_token() }}">
+<html lang="es">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+    <title>Registro de Clientes IA</title>
 
-        <!-- Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    </head>
-    <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100">
-            @include('layouts.navigation')
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
 
-            <!-- Page Heading -->
-            @isset($header)
-                <header class="bg-white shadow">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
-                    </div>
-                </header>
-            @endisset
+<body class="min-h-screen bg-[#F8F9FA]">
 
-            <!-- Page Content -->
-            <main>
-                {{ $slot }}
-            </main>
+<header class="bg-[#2A3F77] shadow-md">
+    <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+
+        <div>
+            <h1 class="text-2xl font-bold text-white">
+                COLRAÍCES
+            </h1>
+
+            <p class="text-sm text-yellow-300">
+                Registro de Clientes IA
+            </p>
         </div>
-    </body>
+
+        <nav class="flex gap-6 text-white">
+
+            <a
+                href="{{ route('clientes.index') }}"
+                class="{{ request()->routeIs('clientes.index') || request()->routeIs('clientes.show') || request()->routeIs('clientes.edit') ? 'font-semibold text-[#FFC107]' : 'transition hover:text-[#FFC107]' }}"
+            >
+                Clientes
+            </a>
+
+            <a
+                href="{{ route('clientes.create') }}"
+                class="{{ request()->routeIs('clientes.create') ? 'font-semibold text-[#FFC107]' : 'transition hover:text-[#FFC107]' }}"
+            >
+                Registrar
+            </a>
+
+        </nav>
+
+    </div>
+</header>
+
+<main class="mx-auto max-w-7xl p-8">
+
+    @yield('content')
+
+</main>
+
+</body>
+
 </html>
