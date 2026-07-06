@@ -2,51 +2,113 @@
 
 @section('content')
 
-    <h1>Lista de Clientes</h1>
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h2 class="text-3xl font-bold text-[#2A3F77]">
+                Clientes
+            </h2>
+
+            <p class="text-gray-500">
+                Gestión de clientes registrados.
+            </p>
+        </div>
+
+        <a
+            href="{{ route('clientes.create') }}"
+            class="rounded-lg bg-[#FFC107] px-5 py-3 font-semibold text-[#2A3F77] transition hover:bg-yellow-400"
+        >
+            + Nuevo Cliente
+        </a>
+    </div>
 
     @if(session('success'))
-        <p style="color: green;">
+        <div class="mb-6 rounded-lg border border-green-200 bg-green-100 p-4 text-green-700">
             {{ session('success') }}
-        </p>
+        </div>
     @endif
 
-    @forelse ($clientes as $cliente)
+    <div class="overflow-hidden rounded-xl bg-white shadow">
 
-        <hr>
+        <table class="min-w-full">
 
-        <p>
-            <strong>{{ $cliente->nombre_completo }}</strong>
-        </p>
+            <thead class="bg-[#2A3F77] text-white">
 
-        <a href="{{ route('clientes.show', $cliente->id) }}">
-            Ver
-        </a>
+            <tr>
+                <th class="px-6 py-4 text-left">Nombre</th>
+                <th class="px-6 py-4 text-left">Acciones</th>
+            </tr>
 
-        |
+            </thead>
 
-        <a href="{{ route('clientes.edit', $cliente->id) }}">
-            Editar
-        </a>
+            <tbody>
 
-        |
+            @forelse($clientes as $cliente)
 
-        <form
-            action="{{ route('clientes.destroy', $cliente->id) }}"
-            method="POST"
-            style="display:inline;"
-        >
-            @csrf
-            @method('DELETE')
+                <tr class="border-b hover:bg-gray-50">
 
-            <button type="submit">
-                Eliminar
-            </button>
-        </form>
+                    <td class="px-6 py-4">
+                        {{ $cliente->nombre_completo }}
+                    </td>
 
-    @empty
+                    <td class="px-6 py-4">
 
-        <p>No hay clientes registrados.</p>
+                        <div class="flex gap-3">
 
-    @endforelse
+                            <a
+                                href="{{ route('clientes.show', $cliente->id) }}"
+                                class="text-blue-600 hover:underline"
+                            >
+                                Ver
+                            </a>
+
+                            <a
+                                href="{{ route('clientes.edit', $cliente->id) }}"
+                                class="text-yellow-600 hover:underline"
+                            >
+                                Editar
+                            </a>
+
+                            <form
+                                action="{{ route('clientes.destroy', $cliente->id) }}"
+                                method="POST"
+                            >
+                                @csrf
+                                @method('DELETE')
+
+                                <button
+                                    class="text-red-600 hover:underline"
+                                    onclick="return confirm('¿Deseas eliminar este cliente?')"
+                                >
+                                    Eliminar
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+            @empty
+
+                <tr>
+
+                    <td
+                        colspan="2"
+                        class="px-6 py-8 text-center text-gray-500"
+                    >
+                        No hay clientes registrados.
+                    </td>
+
+                </tr>
+
+            @endforelse
+
+            </tbody>
+
+        </table>
+
+    </div>
 
 @endsection
