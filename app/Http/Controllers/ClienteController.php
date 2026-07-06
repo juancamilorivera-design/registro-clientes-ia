@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cliente;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Http\Requests\StoreClienteRequest;
+use App\Http\Requests\UpdateClienteRequest;
 
 class ClienteController extends Controller
 {
@@ -29,25 +30,8 @@ class ClienteController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreClienteRequest $request)
     {
-        $request->validate(
-            [
-                'nombre_completo' => 'required',
-                'correo' => 'required|email|unique:clientes,correo',
-                'telefono' => 'required',
-                'pais' => 'required',
-            ],
-            [
-                'nombre_completo.required' => 'El nombre completo es obligatorio.',
-                'correo.required' => 'El correo es obligatorio.',
-                'correo.email' => 'Debe ingresar un correo válido.',
-                'correo.unique' => 'Este correo ya está registrado.',
-                'telefono.required' => 'El teléfono es obligatorio.',
-                'pais.required' => 'El país es obligatorio.',
-            ]
-        );
-
         Cliente::create([
             'nombre_completo' => $request->nombre_completo,
             'correo' => $request->correo,
@@ -79,26 +63,9 @@ class ClienteController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Cliente $cliente)
+    public function update(UpdateClienteRequest $request, Cliente $cliente)
     {
-        $request->validate(
-            [
-                'nombre_completo' => 'required',
-                'correo' => 'required|email|unique:clientes,correo,' . $cliente->id,
-                'telefono' => 'required',
-                'pais' => 'required',
-            ],
-            [
-                'nombre_completo.required' => 'El nombre completo es obligatorio.',
-                'correo.required' => 'El correo es obligatorio.',
-                'correo.email' => 'Debe ingresar un correo válido.',
-                'correo.unique' => 'Este correo ya está registrado.',
-                'telefono.required' => 'El teléfono es obligatorio.',
-                'pais.required' => 'El país es obligatorio.',
-            ]
-        );
-
-        $cliente->update([
+           $cliente->update([
             'nombre_completo' => $request->nombre_completo,
             'correo' => $request->correo,
             'telefono' => $request->telefono,
