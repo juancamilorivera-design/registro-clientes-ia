@@ -28,6 +28,21 @@
             Editar
         </a>
 
+        |
+
+        <form
+            action="{{ route('clientes.destroy', $cliente->id) }}"
+            method="POST"
+            style="display:inline;"
+        >
+            @csrf
+            @method('DELETE')
+
+            <button type="submit">
+                Eliminar
+            </button>
+        </form>
+
     @empty
 
         <p>No hay clientes registrados.</p>
