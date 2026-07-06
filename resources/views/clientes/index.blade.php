@@ -11,9 +11,27 @@
     @endif
 
     @forelse ($clientes as $cliente)
-        <p>{{ $cliente->nombre_completo }}</p>
+
+        <hr>
+
+        <p>
+            <strong>{{ $cliente->nombre_completo }}</strong>
+        </p>
+
+        <a href="{{ route('clientes.show', $cliente->id) }}">
+            Ver
+        </a>
+
+        |
+
+        <a href="{{ route('clientes.edit', $cliente->id) }}">
+            Editar
+        </a>
+
     @empty
+
         <p>No hay clientes registrados.</p>
+
     @endforelse
 
 @endsection
