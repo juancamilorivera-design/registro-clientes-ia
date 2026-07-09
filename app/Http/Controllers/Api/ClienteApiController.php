@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cliente;
+use App\Models\Solicitud;
+use App\Models\Estado;
 use Illuminate\Http\Request;
 
 class ClienteApiController extends Controller
@@ -15,6 +17,12 @@ class ClienteApiController extends Controller
             'correo' => 'required|email|unique:clientes,correo',
             'telefono' => 'required|string|max:20',
             'pais' => 'required|string|max:100',
+
+            'servicio_id' => 'required|exists:servicios,id',
+            'mejorDia' => 'required|date',
+            'franja' => 'required|string|max:50',
+            'necesidad' => 'nullable|string',
+            'politica' => 'required|boolean',
         ]);
 
         $cliente = Cliente::create([
@@ -22,6 +30,19 @@ class ClienteApiController extends Controller
             'correo' => $request->correo,
             'telefono' => $request->telefono,
             'pais' => $request->pais,
+        ]);
+
+        $estadoPendiente = Estado::where('nombre', 'Pendiente')->first();
+
+        Solicitud::create([
+            'cliente_id' => $cliente->id,
+            'servicio_id' => $request->servicio_id,
+            'estado_id' => $estadoPendiente->id,
+            'mejor_dia_llamada' => $request->mejorDia,
+            'franja_horaria' => $request->franja,
+            'necesidad' => $request->necesidad,
+            'acepta_politica' => $request->politica,
+            'observaciones' => null,
         ]);
 
         return response()->json([
