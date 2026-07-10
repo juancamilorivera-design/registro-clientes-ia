@@ -12,3 +12,5 @@ Route::get('/user', function (Request $request) {
 Route::get('/servicios', [ServicioApiController::class, 'index']);
 
 Route::post('/clientes', [ClienteApiController::class, 'store']);
+
+Route::get('/clientes', [ClienteApiController::class, 'index']);

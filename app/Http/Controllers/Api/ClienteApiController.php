@@ -51,4 +51,15 @@ class ClienteApiController extends Controller
             'data' => $cliente,
         ], 201);
     }
+
+    public function index()
+    {
+        $clientes = Cliente::with([
+            'solicitudes.servicio',
+            'solicitudes.estado',
+        ])->get();
+
+        return response()->json($clientes);
+    }
+
 }
