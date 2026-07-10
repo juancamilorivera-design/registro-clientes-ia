@@ -62,4 +62,14 @@ class ClienteApiController extends Controller
         return response()->json($clientes);
     }
 
+    public function show($id)
+    {
+        $cliente = Cliente::with([
+            'solicitudes.servicio',
+            'solicitudes.estado',
+        ])->findOrFail($id);
+
+        return response()->json($cliente);
+    }
+
 }
