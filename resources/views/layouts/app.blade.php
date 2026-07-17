@@ -13,37 +13,47 @@
 <body class="min-h-screen bg-[#F8F9FA]">
 
 <header class="bg-[#2A3F77] shadow-md">
+
     <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
 
-        <div>
-            <h1 class="text-2xl font-bold text-white">
-                COLRAÍCES
-            </h1>
+        <a href="{{ route('dashboard') }}" class="flex items-center gap-4">
 
-            <p class="text-sm text-yellow-300">
-                Registro de Clientes IA
-            </p>
-        </div>
+            <img
+                src="{{ asset('logo.png') }}"
+                alt="Logo Colraíces"
+                class="h-14 w-auto"
+            >
 
-        <nav class="flex gap-6 text-white">
+
+        </a>
+
+        <nav class="flex items-center gap-6 text-white">
+
+            <a
+                href="{{ route('dashboard') }}"
+                class="{{ request()->routeIs('dashboard') ? 'font-semibold text-[#FFC107]' : 'transition hover:text-[#FFC107]' }}"
+            >
+                Dashboard
+            </a>
 
             <a
                 href="{{ route('clientes.index') }}"
-                class="{{ request()->routeIs('clientes.index') || request()->routeIs('clientes.show') || request()->routeIs('clientes.edit') ? 'font-semibold text-[#FFC107]' : 'transition hover:text-[#FFC107]' }}"
+                class="{{ request()->routeIs('clientes.*') ? 'font-semibold text-[#FFC107]' : 'transition hover:text-[#FFC107]' }}"
             >
                 Clientes
             </a>
 
             <a
-                href="{{ route('clientes.create') }}"
-                class="{{ request()->routeIs('clientes.create') ? 'font-semibold text-[#FFC107]' : 'transition hover:text-[#FFC107]' }}"
+                href="{{ route('solicitudes.index') }}"
+                class="{{ request()->routeIs('solicitudes.*') ? 'font-semibold text-[#FFC107]' : 'transition hover:text-[#FFC107]' }}"
             >
-                Registrar
+                Solicitudes
             </a>
 
         </nav>
 
     </div>
+
 </header>
 
 <main class="mx-auto max-w-7xl p-8">
