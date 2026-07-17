@@ -16,14 +16,13 @@
 
     <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
 
-        <a href="{{ route('dashboard') }}" class="flex items-center gap-4">
+        <a href="{{ route('dashboard') }}" class="flex items-center">
 
             <img
                 src="{{ asset('logo.png') }}"
                 alt="Logo Colraíces"
-                class="h-14 w-auto"
+                class="h-14 w-auto transition duration-200 hover:scale-105"
             >
-
 
         </a>
 
@@ -49,6 +48,26 @@
             >
                 Solicitudes
             </a>
+
+            <div class="ml-8 flex items-center gap-5 border-l border-blue-300 pl-8">
+
+                <span class="font-medium text-yellow-300">
+                    {{ Auth::user()->name }}
+                </span>
+
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+
+                    <button
+                        type="submit"
+                        class="rounded-lg border border-red-300 px-3 py-2 text-sm transition hover:bg-red-600 hover:text-white"
+                    >
+                        Cerrar sesión
+                    </button>
+
+                </form>
+
+            </div>
 
         </nav>
 
