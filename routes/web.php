@@ -3,6 +3,7 @@
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\SolicitudController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -15,6 +16,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 
     Route::resource('clientes', ClienteController::class);
+
+    Route::resource('solicitudes', SolicitudController::class)
+        ->only([
+            'index',
+            'show',
+            'edit',
+            'update',
+        ]);
+
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
