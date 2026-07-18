@@ -10,70 +10,84 @@ class ConsultaService
     /**
      * Create a new class instance.
      */
-    public function __construct()
-    {
-        //
-    }
 
     public function ejecutar(array $interpretacion): array
     {
-        $accion = $interpretacion['accion'] ?? null;
+        return match ($interpretacion['accion'] ?? null) {
 
-        switch ($accion) {
+            'contar_clientes' =>
+            $this->contarClientes(),
 
-            case 'contar_clientes':
+            'buscar_clientes' =>
+            $this->buscarClientes($interpretacion),
 
-                return [
-                    'total_clientes' => Cliente::count(),
-                ];
+            'contar_solicitudes' =>
+            $this->contarSolicitudes(),
 
-            case 'buscar_clientes':
+            'buscar_solicitudes' =>
+            $this->buscarSolicitudes($interpretacion),
 
-                if (!isset($interpretacion['pais'])) {
+            default =>
+            [
+                'error' => 'Acción no reconocida.',
+            ],
+        };
+    }
 
-                    return [
-                        'error' => 'No se especificó un país.',
-                    ];
-                }
+    private function contarClientes(): array
+    {
+        return [
+            'total_clientes' => Cliente::count(),
+        ];
+    }
 
-                return Cliente::where(
-                    'pais',
-                    $interpretacion['pais']
-                )->get()->toArray();
+    private function buscarClientes(array $interpretacion): array
+    {
+        if (!isset($interpretacion['pais'])) {
 
-            case 'contar_solicitudes':
-
-                return [
-                    'total_solicitudes' => Solicitud::count(),
-                ];
-
-            case 'buscar_solicitudes':
-
-                if (!isset($interpretacion['estado'])) {
-
-                    return [
-                        'error' => 'No se especificó un estado.',
-                    ];
-                }
-
-                return Solicitud::whereHas('estado', function ($query) use ($interpretacion) {
-
-                    $query->where(
-                        'nombre',
-                        $interpretacion['estado']
-                    );
-
-                })->with([
-                    'cliente',
-                    'estado',
-                    'servicio'
-                ])->get()->toArray();
-
-            default:
-
-                return [
-                    'error' => 'Acción no reconocida.',
-                ];
+            return [
+                'error' => 'No se especificó un país.',
+            ];
         }
+
+        return Cliente::where(
+            'pais',
+            $interpretacion['pais']
+        )->get()->toArray();
+    }
+
+    private function contarSolicitudes(): array
+    {
+        return [
+            'total_solicitudes' => Solicitud::count(),
+        ];
+    }
+
+    private function buscarSolicitudes(array $interpretacion): array
+    {
+        if (!isset($interpretacion['estado'])) {
+
+            return [
+                'error' => 'No se especificó un estado.',
+            ];
+        }
+
+        return Solicitud::whereHas(
+            'estado',
+            function ($query) use ($interpretacion) {
+
+                $query->where(
+                    'nombre',
+                    $interpretacion['estado']
+                );
+            }
+        )
+            ->with([
+                'cliente',
+                'estado',
+                'servicio',
+            ])
+            ->get()
+            ->toArray();
     }
 }
