@@ -4,14 +4,6 @@ namespace App\Services;
 
 class ResponseFormatterService
 {
-    /**
-     * Create a new class instance.
-     */
-    public function __construct()
-    {
-        //
-    }
-
     public function formatear(
         array $interpretacion,
         array $datos
@@ -43,18 +35,13 @@ class ResponseFormatterService
 
     private function formatearClientes(array $datos): string
     {
-        if (isset($datos['error'])) {
-            return $datos['error'];
-        }
-
-        if (count($datos) === 0) {
-            return 'No se encontraron clientes.';
+        if ($mensaje = $this->obtenerMensajeError($datos)) {
+            return $mensaje;
         }
 
         $respuesta = "Clientes encontrados:\n\n";
 
         foreach ($datos as $cliente) {
-
             $respuesta .= "- {$cliente['nombre_completo']} ({$cliente['pais']})\n";
         }
 
@@ -68,21 +55,29 @@ class ResponseFormatterService
 
     private function formatearSolicitudes(array $datos): string
     {
-        if (isset($datos['error'])) {
-            return $datos['error'];
-        }
-
-        if (count($datos) === 0) {
-            return 'No se encontraron solicitudes.';
+        if ($mensaje = $this->obtenerMensajeError($datos)) {
+            return $mensaje;
         }
 
         $respuesta = "Solicitudes encontradas:\n\n";
 
         foreach ($datos as $solicitud) {
-
             $respuesta .= "- {$solicitud['cliente']['nombre_completo']} | Estado: {$solicitud['estado']['nombre']}\n";
         }
 
         return $respuesta;
+    }
+
+    private function obtenerMensajeError(array $datos): ?string
+    {
+        if (isset($datos['error'])) {
+            return $datos['error'];
+        }
+
+        if (empty($datos)) {
+            return 'No se encontraron resultados.';
+        }
+
+        return null;
     }
 }

@@ -7,10 +7,6 @@ use App\Models\Solicitud;
 
 class ConsultaService
 {
-    /**
-     * Create a new class instance.
-     */
-
     public function ejecutar(array $interpretacion): array
     {
         return match ($interpretacion['accion'] ?? null) {
@@ -27,8 +23,7 @@ class ConsultaService
             'buscar_solicitudes' =>
             $this->buscarSolicitudes($interpretacion),
 
-            default =>
-            [
+            default => [
                 'error' => 'Acción no reconocida.',
             ],
         };
@@ -45,17 +40,32 @@ class ConsultaService
     {
         $filtros = $interpretacion['filtros'] ?? [];
 
-        if (!isset($filtros['pais'])) {
+        $query = Cliente::query();
 
-            return [
-                'error' => 'No se especificó un país.',
-            ];
+        if (!empty($filtros['pais'])) {
+            $query->where('pais', $filtros['pais']);
         }
 
-        return Cliente::where(
-            'pais',
-            $filtros['pais']
-        )->get()->toArray();
+        if (!empty($filtros['correo'])) {
+            $query->where('correo', $filtros['correo']);
+        }
+
+        if (!empty($filtros['telefono'])) {
+            $query->where('telefono', $filtros['telefono']);
+        }
+
+        if (!empty($filtros['nombre_completo'])) {
+            $query->where(
+                'nombre_completo',
+                'LIKE',
+                '%' . $filtros['nombre_completo'] . '%'
+            );
+        }
+
+        return $this->obtenerResultados(
+            $query,
+            'No se encontraron clientes con los filtros especificados.'
+        );
     }
 
     private function contarSolicitudes(): array
@@ -69,29 +79,50 @@ class ConsultaService
     {
         $filtros = $interpretacion['filtros'] ?? [];
 
-        if (!isset($filtros['estado'])) {
+        $query = Solicitud::query()->with([
+            'cliente',
+            'estado',
+            'servicio',
+        ]);
 
+        if (!empty($filtros['estado'])) {
+            $query->whereHas('estado', function ($q) use ($filtros) {
+                $q->where('nombre', $filtros['estado']);
+            });
+        }
+
+        if (!empty($filtros['servicio'])) {
+            $query->whereHas('servicio', function ($q) use ($filtros) {
+                $q->where('nombre', $filtros['servicio']);
+            });
+        }
+
+        if (!empty($filtros['cliente'])) {
+            $query->whereHas('cliente', function ($q) use ($filtros) {
+                $q->where(
+                    'nombre_completo',
+                    'LIKE',
+                    '%' . $filtros['cliente'] . '%'
+                );
+            });
+        }
+
+        return $this->obtenerResultados(
+            $query,
+            'No se encontraron solicitudes con los filtros especificados.'
+        );
+    }
+
+    private function obtenerResultados($query, string $mensajeError): array
+    {
+        $resultados = $query->get()->toArray();
+
+        if (empty($resultados)) {
             return [
-                'error' => 'No se especificó un estado.',
+                'error' => $mensajeError,
             ];
         }
 
-        return Solicitud::whereHas(
-            'estado',
-            function ($query) use ($filtros) {
-
-                $query->where(
-                    'nombre',
-                    $filtros['estado']
-                );
-            }
-        )
-            ->with([
-                'cliente',
-                'estado',
-                'servicio',
-            ])
-            ->get()
-            ->toArray();
+        return $resultados;
     }
 }
