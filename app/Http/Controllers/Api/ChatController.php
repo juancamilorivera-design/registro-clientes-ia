@@ -5,14 +5,20 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Services\OpenAIService;
 use Illuminate\Http\Request;
+use App\Services\ConsultaService;
 
 class ChatController extends Controller
 {
     protected OpenAIService $openAIService;
 
-    public function __construct(OpenAIService $openAIService)
-    {
+    protected ConsultaService $consultaService;
+
+    public function __construct(
+        OpenAIService $openAIService,
+        ConsultaService $consultaService
+    ) {
         $this->openAIService = $openAIService;
+        $this->consultaService = $consultaService;
     }
 
     public function chat(Request $request)
@@ -21,12 +27,17 @@ class ChatController extends Controller
             'mensaje' => 'required|string',
         ]);
 
-        $respuesta = $this->openAIService->preguntar(
+        $interpretacion = $this->openAIService->interpretarPregunta(
             $request->mensaje
         );
 
+        $datos = $this->consultaService->ejecutar(
+            $interpretacion
+        );
+
         return response()->json([
-            'respuesta' => $respuesta,
+            'interpretacion' => $interpretacion,
+            'datos' => $datos,
         ]);
     }
 }
