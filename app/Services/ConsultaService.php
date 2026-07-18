@@ -43,7 +43,9 @@ class ConsultaService
 
     private function buscarClientes(array $interpretacion): array
     {
-        if (!isset($interpretacion['pais'])) {
+        $filtros = $interpretacion['filtros'] ?? [];
+
+        if (!isset($filtros['pais'])) {
 
             return [
                 'error' => 'No se especificó un país.',
@@ -52,7 +54,7 @@ class ConsultaService
 
         return Cliente::where(
             'pais',
-            $interpretacion['pais']
+            $filtros['pais']
         )->get()->toArray();
     }
 
@@ -65,7 +67,9 @@ class ConsultaService
 
     private function buscarSolicitudes(array $interpretacion): array
     {
-        if (!isset($interpretacion['estado'])) {
+        $filtros = $interpretacion['filtros'] ?? [];
+
+        if (!isset($filtros['estado'])) {
 
             return [
                 'error' => 'No se especificó un estado.',
@@ -74,11 +78,11 @@ class ConsultaService
 
         return Solicitud::whereHas(
             'estado',
-            function ($query) use ($interpretacion) {
+            function ($query) use ($filtros) {
 
                 $query->where(
                     'nombre',
-                    $interpretacion['estado']
+                    $filtros['estado']
                 );
             }
         )

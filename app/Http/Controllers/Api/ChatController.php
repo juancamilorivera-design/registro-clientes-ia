@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\OpenAIService;
 use Illuminate\Http\Request;
 use App\Services\ConsultaService;
+use App\Services\ResponseFormatterService;
 
 class ChatController extends Controller
 {
@@ -13,12 +14,16 @@ class ChatController extends Controller
 
     protected ConsultaService $consultaService;
 
+    protected ResponseFormatterService $responseFormatterService;
+
     public function __construct(
         OpenAIService $openAIService,
-        ConsultaService $consultaService
+        ConsultaService $consultaService,
+        ResponseFormatterService $responseFormatterService
     ) {
         $this->openAIService = $openAIService;
         $this->consultaService = $consultaService;
+        $this->responseFormatterService = $responseFormatterService;
     }
 
     public function chat(Request $request)
@@ -35,9 +40,13 @@ class ChatController extends Controller
             $interpretacion
         );
 
+        $respuesta = $this->responseFormatterService->formatear(
+            $interpretacion,
+            $datos
+        );
+
         return response()->json([
-            'interpretacion' => $interpretacion,
-            'datos' => $datos,
+            'respuesta' => $respuesta,
         ]);
     }
 }
