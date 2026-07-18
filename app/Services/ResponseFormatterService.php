@@ -17,6 +17,9 @@ class ResponseFormatterService
             'buscar_clientes' =>
             $this->formatearClientes($datos),
 
+            'clientes_por_pais' =>
+            $this->formatearClientesPorPais($datos),
+
             'contar_solicitudes' =>
             $this->formatearConteoSolicitudes($datos),
 
@@ -43,6 +46,21 @@ class ResponseFormatterService
 
         foreach ($datos as $cliente) {
             $respuesta .= "- {$cliente['nombre_completo']} ({$cliente['pais']})\n";
+        }
+
+        return $respuesta;
+    }
+
+    private function formatearClientesPorPais(array $datos): string
+    {
+        if ($mensaje = $this->obtenerMensajeError($datos)) {
+            return $mensaje;
+        }
+
+        $respuesta = "Distribución de clientes por país:\n\n";
+
+        foreach ($datos as $registro) {
+            $respuesta .= "- {$registro['pais']}: {$registro['total']} clientes\n";
         }
 
         return $respuesta;

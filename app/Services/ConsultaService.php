@@ -17,6 +17,9 @@ class ConsultaService
             'buscar_clientes' =>
             $this->buscarClientes($interpretacion),
 
+            'clientes_por_pais' =>
+            $this->clientesPorPais(),
+
             'contar_solicitudes' =>
             $this->contarSolicitudes(),
 
@@ -66,6 +69,15 @@ class ConsultaService
             $query,
             'No se encontraron clientes con los filtros especificados.'
         );
+    }
+
+    private function clientesPorPais(): array
+    {
+        return Cliente::selectRaw('pais, COUNT(*) as total')
+            ->groupBy('pais')
+            ->orderByDesc('total')
+            ->get()
+            ->toArray();
     }
 
     private function contarSolicitudes(): array

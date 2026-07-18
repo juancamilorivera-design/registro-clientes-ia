@@ -39,6 +39,7 @@ Acciones permitidas:
 - buscar_clientes
 - contar_solicitudes
 - buscar_solicitudes
+- clientes_por_pais
 
 Información disponible:
 
@@ -99,6 +100,10 @@ Si el usuario menciona un servicio, agrégalo dentro de:
 }
 
 Si el usuario pregunta por clientes, utiliza la acción buscar_clientes o contar_clientes según corresponda.
+
+Si el usuario pregunta por la cantidad o distribución de clientes por país, utiliza la acción:
+
+clientes_por_pais
 
 Si pregunta por solicitudes, utiliza buscar_solicitudes o contar_solicitudes.
 
