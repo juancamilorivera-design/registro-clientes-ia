@@ -10,16 +10,21 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
+// 🔓 públicas (si quieres)
 Route::get('/servicios', [ServicioApiController::class, 'index']);
 
-Route::post('/clientes', [ClienteApiController::class, 'store']);
+// 🔒 PROTEGIDAS
+Route::middleware('auth:sanctum')->group(function () {
 
-Route::get('/clientes', [ClienteApiController::class, 'index']);
+    Route::post('/clientes', [ClienteApiController::class, 'store']);
+    Route::get('/clientes', [ClienteApiController::class, 'index']);
+    Route::get('/clientes/{id}', [ClienteApiController::class, 'show']);
 
-Route::get('/clientes/{id}', [ClienteApiController::class, 'show']);
+    //Route::post('/chat', [ChatController::class, 'chat']);
 
-Route::post('/chat', [ChatController::class, 'chat']);
+});
 
+// 👇 SOLO PARA PRUEBAS
 Route::get('/test-chat', function () {
     return app(\App\Services\OpenAIService::class)
         ->interpretarPregunta("cuantos clientes hay");
