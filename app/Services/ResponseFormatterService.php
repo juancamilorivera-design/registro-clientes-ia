@@ -26,6 +26,9 @@ class ResponseFormatterService
             'buscar_solicitudes' =>
             $this->formatearSolicitudes($datos),
 
+            'servicio_mas_solicitado' =>
+            $this->formatearServicioMasSolicitado($datos),
+
             default =>
             'No pude interpretar la consulta.',
         };
@@ -84,6 +87,15 @@ class ResponseFormatterService
         }
 
         return $respuesta;
+    }
+
+    private function formatearServicioMasSolicitado(array $datos): string
+    {
+        if ($mensaje = $this->obtenerMensajeError($datos)) {
+            return $mensaje;
+        }
+
+        return "El servicio más solicitado es {$datos['nombre']} con {$datos['total']} solicitudes.";
     }
 
     private function obtenerMensajeError(array $datos): ?string

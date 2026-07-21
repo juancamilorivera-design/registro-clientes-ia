@@ -19,3 +19,8 @@ Route::get('/clientes', [ClienteApiController::class, 'index']);
 Route::get('/clientes/{id}', [ClienteApiController::class, 'show']);
 
 Route::post('/chat', [ChatController::class, 'chat']);
+
+Route::get('/test-chat', function () {
+    return app(\App\Services\OpenAIService::class)
+        ->interpretarPregunta("cuantos clientes hay");
+});

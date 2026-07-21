@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Cliente;
 use App\Models\Solicitud;
+use App\Models\Servicio;
 
 class ConsultaService
 {
@@ -25,6 +26,9 @@ class ConsultaService
 
             'buscar_solicitudes' =>
             $this->buscarSolicitudes($interpretacion),
+
+            'servicio_mas_solicitado' =>
+            $this->servicioMasSolicitado(),
 
             default => [
                 'error' => 'Acción no reconocida.',
@@ -73,11 +77,19 @@ class ConsultaService
 
     private function clientesPorPais(): array
     {
-        return Cliente::selectRaw('pais, COUNT(*) as total')
+        $datos = Cliente::selectRaw('pais, COUNT(*) as total')
             ->groupBy('pais')
             ->orderByDesc('total')
             ->get()
             ->toArray();
+
+        if (empty($datos)) {
+            return [
+                'error' => 'No hay clientes registrados.',
+            ];
+        }
+
+        return $datos;
     }
 
     private function contarSolicitudes(): array
@@ -109,12 +121,12 @@ class ConsultaService
             });
         }
 
-        if (!empty($filtros['cliente'])) {
+        if (!empty($filtros['nombre_completo'])) {
             $query->whereHas('cliente', function ($q) use ($filtros) {
                 $q->where(
                     'nombre_completo',
                     'LIKE',
-                    '%' . $filtros['cliente'] . '%'
+                    '%' . $filtros['nombre_completo'] . '%'
                 );
             });
         }
@@ -137,4 +149,23 @@ class ConsultaService
 
         return $resultados;
     }
+
+    private function servicioMasSolicitado(): array
+    {
+        $servicio = Servicio::withCount('solicitudes')
+            ->orderByDesc('solicitudes_count')
+            ->first();
+
+        if (!$servicio || $servicio->solicitudes_count === 0) {
+            return [
+                'error' => 'No hay solicitudes registradas.',
+            ];
+        }
+
+        return [
+            'nombre' => $servicio->nombre,
+            'total' => $servicio->solicitudes_count,
+        ];
+    }
+
 }

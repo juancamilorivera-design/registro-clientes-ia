@@ -4,11 +4,9 @@ namespace App\Services;
 
 use OpenAI;
 
-
 class OpenAIService
 {
     protected $client;
-
 
     public function __construct()
     {
@@ -40,6 +38,7 @@ Acciones permitidas:
 - contar_solicitudes
 - buscar_solicitudes
 - clientes_por_pais
+- servicio_mas_solicitado
 
 Información disponible:
 
@@ -63,85 +62,102 @@ Relaciones:
 - Una solicitud tiene un estado.
 - Una solicitud tiene un servicio.
 
-Si el usuario menciona un país, agrégalo dentro de:
+----------------------------------------
+REGLAS IMPORTANTES
+----------------------------------------
 
-\"filtros\": {
-    \"pais\": \"...\"
-}
+1. SOLO usa \"clientes_por_pais\" si el usuario dice explícitamente:
+   - \"clientes por país\"
+   - \"distribución por país\"
+   - \"cuántos clientes hay en cada país\"
 
-Si menciona un estado, agrégalo dentro de:
+2. Si el usuario dice:
+   - \"cuántos clientes hay\" → usar contar_clientes
+   - \"muéstrame clientes\" → usar buscar_clientes
 
-\"filtros\": {
-    \"estado\": \"...\"
-}
+3. Si el usuario pregunta por solicitudes:
+   - \"cuántas solicitudes\" → contar_solicitudes
+   - \"mostrar solicitudes\" → buscar_solicitudes
 
-Si el usuario menciona un correo electrónico, agrégalo dentro de:
+4. Si el usuario pregunta:
+   - \"servicio más solicitado\"
+   - \"qué servicio se solicita más\"
+   - \"qué servicio prefieren\"
 
-\"filtros\": {
-    \"correo\": \"...\"
-}
+   usa:
+   \"servicio_mas_solicitado\"
 
-Si el usuario menciona un teléfono, agrégalo dentro de:
+   ⚠️ Y NO incluyas filtros
 
-\"filtros\": {
-    \"telefono\": \"...\"
-}
+----------------------------------------
+FILTROS
+----------------------------------------
 
-Si el usuario menciona un nombre de cliente, agrégalo dentro de:
+Si el usuario menciona:
 
-\"filtros\": {
-    \"nombre_completo\": \"...\"
-}
+- país → filtros.pais
+- estado → filtros.estado
+- correo → filtros.correo
+- teléfono → filtros.telefono
+- nombre → filtros.nombre_completo
+- servicio → filtros.servicio (solo si NO es servicio_mas_solicitado)
 
-Si el usuario menciona un servicio, agrégalo dentro de:
+----------------------------------------
+REGLAS DE SALIDA
+----------------------------------------
 
-\"filtros\": {
-    \"servicio\": \"...\"
-}
+- SOLO responde JSON válido
+- NO markdown
+- NO texto adicional
+- NO explicaciones
 
-Si el usuario pregunta por clientes, utiliza la acción buscar_clientes o contar_clientes según corresponda.
-
-Si el usuario pregunta por la cantidad o distribución de clientes por país, utiliza la acción:
-
-clientes_por_pais
-
-Si pregunta por solicitudes, utiliza buscar_solicitudes o contar_solicitudes.
-
-Si identifica filtros, inclúyelos dentro del objeto \"filtros\".
-
-Nunca inventes campos que no existan.
-
-Si la pregunta no corresponde a ninguna acción permitida o no puede resolverse con la información disponible, responde exactamente:
+Si no entiendes la pregunta:
 
 {
     \"accion\": \"desconocida\",
     \"filtros\": {}
 }
 
-Responde únicamente con un objeto JSON válido.
-
-No utilices Markdown.
-
-No agregues explicaciones.
-
-No uses bloques de código.
-
-No escribas ningún texto antes o después del JSON.
+----------------------------------------
 
 Pregunta:
 
 {$mensaje}
 ";
 
-        $respuesta = $this->client->responses()->create([
-            'model' => config('services.openai.model'),
-            'input' => $prompt,
-        ]);
+        try {
+            $respuesta = $this->client->responses()->create([
+                'model' => config('services.openai.model'),
+                'input' => [
+                    [
+                        'role' => 'user',
+                        'content' => $prompt
+                    ]
+                ],
+            ]);
 
-        return json_decode($respuesta->outputText, true);
+            // ✅ CORRECCIÓN CLAVE (AQUÍ ESTABA TU ERROR)
+            $texto = $respuesta->output[0]->content[0]->text ?? '';
+
+            $resultado = json_decode($texto, true);
+
+            // Validación fuerte
+            if (!is_array($resultado) || !isset($resultado['accion'])) {
+                return [
+                    'accion' => 'desconocida',
+                    'filtros' => []
+                ];
+            }
+
+            return $resultado;
+
+        } catch (\Exception $e) {
+
+            // Cuando no hay saldo o falla la API
+            return [
+                'accion' => 'desconocida',
+                'filtros' => []
+            ];
+        }
     }
-
-
-
-
 }
