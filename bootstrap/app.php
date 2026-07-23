@@ -15,11 +15,23 @@ return Application::configure(basePath: dirname(__DIR__))
 
     ->withMiddleware(function (Middleware $middleware): void {
 
-        // 🔥 ACTIVAR CORS PARA API
+        /*
+        |--------------------------------------------------------------------------
+        | Sanctum SPA
+        |--------------------------------------------------------------------------
+        */
+
+        $middleware->statefulApi();
+
+        /*
+        |--------------------------------------------------------------------------
+        | API Middleware
+        |--------------------------------------------------------------------------
+        */
+
         $middleware->api(prepend: [
             \Illuminate\Http\Middleware\HandleCors::class,
         ]);
-
     })
 
     ->withExceptions(function (Exceptions $exceptions): void {
